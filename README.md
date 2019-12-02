@@ -1,4 +1,4 @@
-# Benndo, Worpress Front
+# Bennedo, Wordpress Front
 
 
 ### Prerequisites
