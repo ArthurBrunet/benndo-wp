@@ -37,21 +37,25 @@
                 </div>
                 <div class="col item social"><a href="#"><i class="icon ion-social-facebook"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-snapchat"></i></a><a href="#"><i class="icon ion-social-instagram"></i></a></div>
             </div>
-            <p class="copyright">Company Name © 2017</p>
+            <p class="copyright">Bennedo © 2017</p>
         </div>
     </footer>
 </div>
 
 
+
+<button onclick="myFunction()">Click me</button>
+
 <script>
-    var a = Swal.fire({
+    function myFunction(){
+        Swal.fire({
         title: 'Error!',
         text: 'Do you want to continue',
         icon: 'error',
         confirmButtonText: 'Cool'
     })
+    }
 </script>
-<button onclick="a">bla</button>
 
 <?php wp_footer() ?>
 <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
