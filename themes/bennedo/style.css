@@ -21,3 +21,7 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 */
 
 #mapid { height: 500px; }
+
+.logo {
+    width: 100px;
+}

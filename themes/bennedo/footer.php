@@ -8,36 +8,52 @@
  *
  * @package bennedo
  */
+           $args = array(
+                        "page"       => 'politique-de-confidentialite',
+                    );
+                    // The Query
+                    $the_query = new WP_Query( $args );
 
-?>
+                    // The Loop
+                    if ( $the_query->have_posts() ) {
+                        while ( $the_query->have_posts() ) {
+                            $the_query->the_post();
+                            $mentions = get_the_permalink() . '/mentions';
+                            $home = get_the_permalink();
+                         }
+                    }
+                    ?>
 
 <div class="footer-dark">
     <footer>
         <div class="container">
             <div class="row">
-                <div class="col-sm-6 col-md-3 item">
-                    <h3>Services</h3>
+                <div class="col-sm-12 col-md-6 item text-center">
+                    <h3>A propos</h3>
                     <ul>
-                        <li><a href="#">Web design</a></li>
-                        <li><a href="#">Development</a></li>
-                        <li><a href="#">Hosting</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-6 col-md-3 item">
-                    <h3>About</h3>
-                    <ul>
-                        <li><a href="#">Company</a></li>
-                        <li><a href="#">Team</a></li>
-                        <li><a href="#">Careers</a></li>
+                        <li><a href="<?php echo $home ?>">Home</a></li>
+                        <li><a href="<?php echo $mentions ?>">Mentions Légales</a></li>
+                        <li><a href="mailto:contact@bennedo.com">Nous contacter</a></li>
                     </ul>
                 </div>
                 <div class="col-md-6 item text">
                     <h3>Bennedo</h3>
-                    <p>Praesent sed lobortis mi. Suspendisse vel placerat ligula. Vivamus ac sem lacus. Ut vehicula rhoncus elementum. Etiam quis tristique lectus. Aliquam in arcu eget velit pulvinar dictum vel in justo.</p>
+                    <p>
+                        Bennedo est une start up rouennaise qui permet au collectivité de mettre en place une application web
+                        qui localise les bennes de verre autour de vous. <br><br>
+                        Si vous êtes une collectivité, vous pouvez nous contacter pour mettre en place votre Bennedo.
+                    </p>
                 </div>
-                <div class="col item social"><a href="#"><i class="icon ion-social-facebook"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-snapchat"></i></a><a href="#"><i class="icon ion-social-instagram"></i></a></div>
+                <div class="col item social">
+                    <a href="#"><i class="icon ion-social-facebook"></i></a>
+                    <a href="#"><i class="icon ion-social-twitter"></i></a>
+                    <a href="#"><i class="icon ion-social-linkedin"></i></a>
+                    <a href="#"><i class="icon ion-social-instagram"></i></a>
+                </div>
             </div>
-            <p class="copyright">Bennedo © 2017</p>
+            <p class="copyright">Bennedo © 2020 <br>
+            Ceci est un exercice dans le cadre de la NFactory
+            </p>
         </div>
     </footer>
 </div>
