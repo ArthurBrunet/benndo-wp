@@ -20,8 +20,13 @@ Normalizing styles have been helped along thanks to the fine work of
 Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 */
 
-#mapid { height: 500px; }
+#map { height: 500px; }
 
 .logo {
     width: 100px;
+}
+
+.img_marker {
+    width: 1.5em;
+    height: 1.5em;
 }

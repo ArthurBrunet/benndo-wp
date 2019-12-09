@@ -60,25 +60,20 @@
 
 
 
-<button onclick="myFunction()">Click me</button>
 
-<script>
-    function myFunction(){
-        Swal.fire({
-        title: 'Error!',
-        text: 'Do you want to continue',
-        icon: 'error',
-        confirmButtonText: 'Cool'
-    })
-    }
-</script>
+
 
 <?php wp_footer() ?>
-<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-        crossorigin=""></script>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.css' rel='stylesheet' />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
-<?php include "inc/js.php";
+<?php
+include "inc/alert.php";
+include "inc/map.php";
+include "inc/api.php";
+include "inc/f.php";
+include "inc/marker.php";
+
 ?>
 </body>
 </html>

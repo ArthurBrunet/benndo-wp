@@ -6,6 +6,7 @@ Template Name: Home
 
 <?php get_header(); ?>
 
+
 <div class="map-clean">
     <div class="container">
         <div class="intro">
@@ -17,5 +18,5 @@ Template Name: Home
         </div>
     </div>
 
-    <div id="mapid"></div>
+    <div id='map'></div>
 <?php get_footer()?>
