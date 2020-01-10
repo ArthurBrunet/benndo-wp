@@ -27,10 +27,30 @@
     el.id = 'marker';
 
     // create the marker
-    new mapboxgl.Marker(el)
+    var marker = new mapboxgl.Marker(el)
         .setLngLat(fcoord)
         .setPopup(popup) // sets a popup on this marker
         .addTo(map);
+
+    function animateMarker(timestamp) {
+        var radius = 20;
+
+// Update the data to a new position based on the animation timestamp. The
+// divisor in the expression `timestamp / 1000` controls the animation speed.
+        marker.setLngLat([
+            Math.cos(timestamp / 1000) * radius,
+            Math.sin(timestamp / 1000) * radius
+        ]);
+
+// Ensure it's added to the map. This is safe to call if it's already added.
+        marker.addTo(map);
+
+// Request the next frame of the animation.
+        requestAnimationFrame(animateMarker);
+    }
+
+    // Start the animation.
+    requestAnimationFrame(animateMarker);
 
     function f() {
         Swal.fire({
@@ -44,4 +64,7 @@
               `
         })
     }
+
+
+
 </script>

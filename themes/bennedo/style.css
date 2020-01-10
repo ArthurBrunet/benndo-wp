@@ -19,6 +19,25 @@ Underscores is distributed under the terms of the GNU GPL v2 or later.
 Normalizing styles have been helped along thanks to the fine work of
 Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
 */
+@font-face {font-family:"Bebas Neue Regular";src:url("assets/fonts/BebasNeue-Regular.eot?") format("eot"),url("assets/fonts/BebasNeue-Regular.woff") format("woff"),url("assets/fonts/BebasNeue-Regular.ttf") format("truetype"),url("assets/fonts/BebasNeue-Regular.svg#BebasNeue-Regular") format("svg");font-weight:normal;font-style:normal;}
+@font-face {font-family:"Comfortaa-Regular";src:url("assets/fonts/Comfortaa-Regular.ttf") format("truetype");font-weight:normal;font-style:normal;}
+
+
+.main-title {
+    font-size: 5em;
+}
+
+.second-title {
+    font-size: 1.6em !important;
+}
+
+.main-p {
+    font-size: 1.6em;
+}
+
+.second-p {
+    font-size: 1em;
+}
 
 #map { height: 500px; }
 
@@ -30,3 +49,5 @@ Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
     width: 1.5em;
     height: 1.5em;
 }
+
+
