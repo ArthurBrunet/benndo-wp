@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the WordPress - 5.3.x - Development package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2019-12-19 12:37:22+0000\n"
+"PO-Revision-Date: 2020-01-10 07:46:09+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -9929,7 +9929,7 @@ msgstr "Modifier l’élément de menu : %1$s (%2$s)"
 #. translators: 1: Title of a menu item, 2: Type of a menu item.
 #: wp-includes/customize/class-wp-customize-nav-menu-item-control.php:81
 msgid "Remove Menu Item: %1$s (%2$s)"
-msgstr "Enlever l’élément du menu : %1$s (%2$s)"
+msgstr "Retirer l’élément du menu : %1$s (%2$s)"
 
 #: wp-includes/class-wp-customize-nav-menus.php:1187
 msgid "Toggle section: Custom Links"
@@ -13588,7 +13588,7 @@ msgstr "Les scripts et les styles ne peuvent pas être enregistrés ou ajoutés 
 #. translators: 1: Home URL, 2: Admin URL.
 #: wp-includes/ms-functions.php:2102
 msgid "You have been added to this site. Please visit the <a href=\"%1$s\">homepage</a> or <a href=\"%2$s\">log in</a> using your username and password."
-msgstr "Vous avez été ajouté à ce site. Vous pouvez vous rendre sur <a href=\"%s\">sa page d’accueil</a> ou <a href=\"%s\">vous connecter</a> à l’aide de votre identifiant et mot de passe."
+msgstr "Vous avez été ajouté à ce site. Vous pouvez vous rendre sur <a href=\"%1$s\">sa page d’accueil</a> ou <a href=\"%2$s\">vous connecter</a> à l’aide de votre identifiant et mot de passe."
 
 #: wp-includes/script-loader.php:1231
 msgid "Memory exceeded. Please try another smaller file."

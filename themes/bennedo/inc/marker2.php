@@ -122,7 +122,7 @@ console.log(geojson);
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v9',
         center: [-77, 37.8],
-        zoom: 3
+        zoom: 15
     });
 
 
@@ -137,7 +137,7 @@ console.log(geojson);
     geojson.features.forEach(function(marker) {
 
         // if the trash are not full neither broken
-        if (marker.properties.status === 0) {
+        if (marker.properties.status === 1) {
 
             // create a HTML element for each feature
             var el = document.createElement('div');
