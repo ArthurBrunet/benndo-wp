@@ -8,50 +8,7 @@ $img_no =           '<img class="img_marker" title ="Non"               src="' .
 $green_marker =             get_template_directory_uri() . '/assets/img/green.png';
 $red_marker =               get_template_directory_uri() . '/assets/img/red.png';
 ?>
-<script>
-    function httpGet(theUrl)
-    {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-        xmlHttp.send( null );
-        return xmlHttp.responseText;
-    }
 
-    var objs = JSON.parse(httpGet('http://localhost:8001/bins/getall'));
-
-    //console.log(objs);
-
-    const geojson =
-        {
-            "type": "FeatureCollection",
-            "features": []
-        };
-    //console.log(geojson);
-
-    for(let i = 0; i < objs.length; i++) {
-        const obj = objs[i];
-
-        // code qui check et update le statut
-
-        geojson.features.push (
-            {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [obj.Point[0], obj.Point[1]]
-                },
-                "properties": {
-                    "city": obj.city,
-                    "id": obj.id,
-                    "status" : 1
-                }
-            },
-        )
-        //console.log(obj.id);
-    }
-
-    console.log(geojson);
-</script>
 
 <style>
     .marker_green {
@@ -82,7 +39,7 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
 </style>
 
 <script>
-  
+
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYXJwcDIiLCJhIjoiY2szazZ6bnJjMDgwYzNtbm1zNHFocGZzNiJ9._V5QyjDorkoGktSpNHc1nA';
 
     var Direction = new MapboxDirections({
@@ -91,13 +48,17 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
         controls:
             {inputs: false}
     });
-  
+    var geocoder = new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+    })
+
     const a = 1;
-  
+
     var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v9',
-        center: [1.43, 43.7],    
+        center: [1.43, 43.7],
         zoom: 15
     });
 
@@ -106,6 +67,12 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
         timeout: 5000,
         maximumAge: 1
     };
+    const geojson =
+        {
+            "type": "FeatureCollection",
+            "features": []
+        };
+    //console.log(geojson);
 
     function success(pos) {
         var crd = pos.coords;
@@ -115,15 +82,62 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
         console.log(`Latitude : ${crd.latitude}`);
         console.log(`Longitude : ${crd.longitude}`);
         console.log(`La précision est de ${crd.accuracy} mètres.`);
+
+        function httpGet(theUrl)
+        {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+            xmlHttp.send( null );
+            return xmlHttp.responseText;
+        }
+
+
+        var long = String(crd.longitude).replace('.','I');
+        var lat = String(crd.latitude).replace('.','I');
+
+        var objs = JSON.parse(httpGet('http://localhost:8001/bins/getone/'+ long +'/'+ lat +'/300'));
+
+        //console.log(objs);
+
+
+
+        for(let i = 0; i < objs.length; i++) {
+            const obj = objs[i];
+
+            // code qui check et update le statut
+
+            geojson.features.push (
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [obj.Point[0], obj.Point[1]]
+                    },
+                    "properties": {
+                        "city": obj.city,
+                        "id": obj.id,
+                        "status" : 1
+                    }
+                },
+            )
+            //console.log(obj.id);
+        }
         Direction.setOrigin([crd.longitude, crd.latitude]);
 
+        var test = Direction.getOrigin;
+        console.log(test);
+
     }
 
 
-
+    map.addControl(geocoder);
     function error(err) {
         Direction.interactive(true);
+        $("#map").click(function() {
+            console.log(geocoder.getCountries);
+        });
     }
+
 
     navigator.geolocation.getCurrentPosition(success, error, options);
 
@@ -139,10 +153,7 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
             trackUserLocation: true
     }));
 
-    map.addControl(new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl
-    }));
+
 
 
 
@@ -177,11 +188,11 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                 )
 
                 .addTo(map);
-            console.log(marker.geometry.coordinates)
+
         }
 
     });
-  
+
     map.addControl(
         Direction,
         'bottom-left'
