@@ -21,5 +21,4 @@ Template Name: Home
     <div id='map'></div>
 
 <?php
-include "inc/data.php";
 get_footer()?>
