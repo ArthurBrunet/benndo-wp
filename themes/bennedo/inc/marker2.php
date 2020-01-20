@@ -74,8 +74,12 @@ console.log(geojson);
 
 <script>
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYXJwcDIiLCJhIjoiY2szazZ6bnJjMDgwYzNtbm1zNHFocGZzNiJ9._V5QyjDorkoGktSpNHc1nA';
+
     var Direction = new MapboxDirections({
-        accessToken: mapboxgl.accessToken
+        accessToken: mapboxgl.accessToken,
+        interactive: false,
+        controls:
+            {inputs: false}
     });
 
     var map = new mapboxgl.Map({
@@ -94,17 +98,19 @@ console.log(geojson);
     function success(pos) {
         var crd = pos.coords;
 
+
         console.log('Votre position actuelle est :');
         console.log(`Latitude : ${crd.latitude}`);
         console.log(`Longitude : ${crd.longitude}`);
         console.log(`La précision est de ${crd.accuracy} mètres.`);
         Direction.setOrigin([crd.longitude, crd.latitude]);
+
     }
 
 
 
     function error(err) {
-
+        Direction.interactive(true);
     }
 
     navigator.geolocation.getCurrentPosition(success, error, options);
@@ -129,9 +135,9 @@ console.log(geojson);
 
 
 
-    function navigate(i)
+    function navigate(i,y)
     {
-        console.log(i);
+        Direction.setDestination([i,y]);
     }
 
 
@@ -152,7 +158,7 @@ console.log(geojson);
                     .setHTML(
                         '<h5>' + marker.properties.city + '</h5><br>' +
                         '<h6>' + marker.properties.id + '</h6><br>' +
-                        '<button type="button" class="btn btn-info mr-3" onclick="navigate('+ marker.geometry.coordinates +')"><?= $img_navigate ?></button>' +
+                        '<button type="button" class="btn btn-info mr-3" onclick="navigate('+ marker.geometry.coordinates[0]+','+marker.geometry.coordinates[1] +')"><?= $img_navigate ?></button>' +
                         '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
                         '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
                     )
