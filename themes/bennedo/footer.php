@@ -75,7 +75,6 @@
 <?php
 include "inc/alert.php";
 include "inc/api.php";
-include "inc/map2.php";
 include "inc/marker2.php";
 include "inc/f.php";
 include "inc/data.php";

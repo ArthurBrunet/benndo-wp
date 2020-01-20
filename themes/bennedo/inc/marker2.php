@@ -7,52 +7,7 @@ $img_no =           '<img class="img_marker" title ="Non"               src="' .
 
 $green_marker =             get_template_directory_uri() . '/assets/img/green.png';
 $red_marker =               get_template_directory_uri() . '/assets/img/red.png';
-
-$api = json_decode('
-{
-  "0": [
-    { 
-    "id":"b7b18dfd-9178-4b64-b10f-1e06bac1696a",
-    "coords":"SRID=4326;POINT(1.52074078929 43.5615354615)",
-    "name":"pas renseign\u00e9",
-    "city":"Saint-111111111111111",
-    "city_code":31506,
-    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},
-    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}
-    }
-  ],
-  "1": [
-    {
-    "id":"b7b18dfd-9178-4b64-b10f-1e06bac1696a",
-    "coords":"SRID=4326;POINT(1.62074078929 43.6615354615)",
-    "name":"pas renseign\u00e9",
-    "city":"Saint-2222222222222222222",
-    "city_code":31506,
-    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},
-    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}
-    }
-  ],
-    "2": [
-    {
-    "id":"b7b18dfd-9178-4b64-b10f-1e06bac1696a",
-    "coords":"SRID=4326;POINT(1.65074078929 43.5615354615)",
-    "name":"pas renseign\u00e9",
-    "city":"Saint-33333333333333333333333",
-    "city_code":31506,
-    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},
-    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}
-    }
-  ]
-  
- }
- ', true);
-
 ?>
-<pre>
-<?php
-//var_dump($api);
-?>
-</pre>
 
 <script>
     const json = '{\n  "0": [\n    { \n    "id":"id1",\n    "coords":"SRID=4326;POINT(1.52074078929 43.5615354615)",\n    "name":"pas renseign\u00e9",\n    "city":"Saint-111111111111111",\n    "city_code":31506,\n    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},\n    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}\n    }\n  ],\n  "1": [\n    {\n    "id":"id2",\n    "coords":"SRID=4326;POINT(1.62074078929 43.6615354615)",\n    "name":"pas renseign\u00e9",\n    "city":"Saint-2222222222222222222",\n    "city_code":31506,\n    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},\n    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}\n    }\n  ],\n    "2": [\n    {\n    "id":"id3",\n    "coords":"SRID=4326;POINT(1.65074078929 43.5615354615)",\n    "name":"pas renseign\u00e9",\n    "city":"Saint-33333333333333333333333",\n    "city_code":31506,\n    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},\n    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}\n    }\n  ]\n  \n }';
@@ -81,7 +36,11 @@ $api = json_decode('
                     "status" : 1,
                 }
             },
-        )}
+        )
+
+
+
+    }
 console.log(geojson);
 </script>
 
@@ -114,16 +73,54 @@ console.log(geojson);
 </style>
 
 <script>
-    var a = 1;
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYXJwcDIiLCJhIjoiY2szazZ6bnJjMDgwYzNtbm1zNHFocGZzNiJ9._V5QyjDorkoGktSpNHc1nA';
+    var options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 1
+    };
+
+    function success(pos) {
+        var crd = pos.coords;
+
+        console.log('Votre position actuelle est :');
+        console.log(`Latitude : ${crd.latitude}`);
+        console.log(`Longitude : ${crd.longitude}`);
+        console.log(`La précision est de ${crd.accuracy} mètres.`);
+
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v9',
+            center: [crd.longitude, crd.latitude],
+            zoom: 18
+        });
+
+        //Creation de la geolocalisation
+        map.addControl(new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            showUserLocation: true,
+            trackUserLocation: true
+        }));
+    }
+
+
+
+    function error(err) {
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v9',
+            center: [-77.032, 38.913],
+            zoom: 10
+        });
+    }
+
+    navigator.geolocation.getCurrentPosition(success, error, options);
 
     // Create the map
-    var map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v9',
-        center: [-77, 37.8],
-        zoom: 15
-    });
+
+
 
 
     map.addControl(
@@ -132,6 +129,14 @@ console.log(geojson);
             mapboxgl: mapboxgl
         })
     );
+
+    map.addControl(
+        new MapboxDirections({
+            accessToken: mapboxgl.accessToken
+        }),
+        'top-left'
+    );
+
 
     // add markers to map
     geojson.features.forEach(function(marker) {
