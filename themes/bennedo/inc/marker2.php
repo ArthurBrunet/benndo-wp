@@ -8,81 +8,50 @@ $img_no =           '<img class="img_marker" title ="Non"               src="' .
 $green_marker =             get_template_directory_uri() . '/assets/img/green.png';
 $red_marker =               get_template_directory_uri() . '/assets/img/red.png';
 
-$api = json_decode('
-{
-  "0": [
-    { 
-    "id":"b7b18dfd-9178-4b64-b10f-1e06bac1696a",
-    "coords":"SRID=4326;POINT(1.52074078929 43.5615354615)",
-    "name":"pas renseign\u00e9",
-    "city":"Saint-111111111111111",
-    "city_code":31506,
-    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},
-    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}
-    }
-  ],
-  "1": [
-    {
-    "id":"b7b18dfd-9178-4b64-b10f-1e06bac1696a",
-    "coords":"SRID=4326;POINT(1.62074078929 43.6615354615)",
-    "name":"pas renseign\u00e9",
-    "city":"Saint-2222222222222222222",
-    "city_code":31506,
-    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},
-    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}
-    }
-  ],
-    "2": [
-    {
-    "id":"b7b18dfd-9178-4b64-b10f-1e06bac1696a",
-    "coords":"SRID=4326;POINT(1.65074078929 43.5615354615)",
-    "name":"pas renseign\u00e9",
-    "city":"Saint-33333333333333333333333",
-    "city_code":31506,
-    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},
-    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}
-    }
-  ]
-  
- }
- ', true);
-
 ?>
-<pre>
-<?php
-//var_dump($api);
-?>
-</pre>
-
 <script>
-    const json = '{\n  "0": [\n    { \n    "id":"id1",\n    "coords":"SRID=4326;POINT(1.52074078929 43.5615354615)",\n    "name":"pas renseign\u00e9",\n    "city":"Saint-111111111111111",\n    "city_code":31506,\n    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},\n    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}\n    }\n  ],\n  "1": [\n    {\n    "id":"id2",\n    "coords":"SRID=4326;POINT(1.62074078929 43.6615354615)",\n    "name":"pas renseign\u00e9",\n    "city":"Saint-2222222222222222222",\n    "city_code":31506,\n    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},\n    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}\n    }\n  ],\n    "2": [\n    {\n    "id":"id3",\n    "coords":"SRID=4326;POINT(1.65074078929 43.5615354615)",\n    "name":"pas renseign\u00e9",\n    "city":"Saint-33333333333333333333333",\n    "city_code":31506,\n    "created_at":{"date":"2020-01-0911:05:37.000000","timezone_type":3,"timezone":"Europe\/Berlin"},\n    "updated_at":{"date":"2020-01-0914:20:42.000000","timezone_type":3,"timezone":"Europe\/Berlin"}\n    }\n  ]\n  \n }';
-    var objs = JSON.parse(json);
+    function httpGet(theUrl)
+    {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
 
-    var geojson =
+    var objs = JSON.parse(httpGet('http://localhost:8001/bins/getall'));
+
+    //console.log(objs);
+
+    const geojson =
         {
             "type": "FeatureCollection",
-            "features": [
-
-            ]
+            "features": []
         };
+    //console.log(geojson);
 
-    for(var index in objs) {
-        var attr = objs[index];
+    for(let i = 0; i < objs.length; i++) {
+        const obj = objs[i];
+
+        // code qui check et update le statut
+
         geojson.features.push (
             {
                 "type": "Feature",
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [-77.032, 38.913]
+                    "coordinates": [obj.Point[0], obj.Point[1]]
                 },
                 "properties": {
-                    "city": attr[0].city,
-                    "id": attr[0].id,
-                    "status" : 1,
+                    "city": obj.city,
+                    "id": obj.id,
+                    "status" : 1
                 }
             },
-        )}
-console.log(geojson);
+        )
+        //console.log(obj.id);
+    }
+
+    console.log(geojson);
 </script>
 
 <style>
@@ -114,14 +83,14 @@ console.log(geojson);
 </style>
 
 <script>
-    var a = 1;
+    const a = 1;
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYXJwcDIiLCJhIjoiY2szazZ6bnJjMDgwYzNtbm1zNHFocGZzNiJ9._V5QyjDorkoGktSpNHc1nA';
 
     // Create the map
-    var map = new mapboxgl.Map({
+    const map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v9',
-        center: [-77, 37.8],
+        center: [1.43, 43.7],
         zoom: 15
     });
 
@@ -158,9 +127,6 @@ console.log(geojson);
 
                 .addTo(map);
         }
-
-
-
 
     });
 
