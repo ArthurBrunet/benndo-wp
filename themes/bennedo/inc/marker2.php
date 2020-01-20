@@ -7,7 +7,6 @@ $img_no =           '<img class="img_marker" title ="Non"               src="' .
 
 $green_marker =             get_template_directory_uri() . '/assets/img/green.png';
 $red_marker =               get_template_directory_uri() . '/assets/img/red.png';
-
 ?>
 <script>
     function httpGet(theUrl)
@@ -83,24 +82,76 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
 </style>
 
 <script>
-    const a = 1;
+  
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYXJwcDIiLCJhIjoiY2szazZ6bnJjMDgwYzNtbm1zNHFocGZzNiJ9._V5QyjDorkoGktSpNHc1nA';
 
-    // Create the map
-    const map = new mapboxgl.Map({
+    var Direction = new MapboxDirections({
+        accessToken: mapboxgl.accessToken,
+        interactive: false,
+        controls:
+            {inputs: false}
+    });
+  
+    const a = 1;
+  
+    var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v9',
-        center: [1.43, 43.7],
+        center: [1.43, 43.7],    
         zoom: 15
     });
 
+    var options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 1
+    };
 
-    map.addControl(
-        new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl
-        })
-    );
+    function success(pos) {
+        var crd = pos.coords;
+
+
+        console.log('Votre position actuelle est :');
+        console.log(`Latitude : ${crd.latitude}`);
+        console.log(`Longitude : ${crd.longitude}`);
+        console.log(`La précision est de ${crd.accuracy} mètres.`);
+        Direction.setOrigin([crd.longitude, crd.latitude]);
+
+    }
+
+
+
+    function error(err) {
+        Direction.interactive(true);
+    }
+
+    navigator.geolocation.getCurrentPosition(success, error, options);
+
+    // Create the map
+
+
+    //Creation de la geolocalisation
+    map.addControl(new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            showUserLocation: true,
+            trackUserLocation: true
+    }));
+
+    map.addControl(new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+    }));
+
+
+
+
+    function navigate(i,y)
+    {
+        Direction.setDestination([i,y]);
+    }
+
 
     // add markers to map
     geojson.features.forEach(function(marker) {
@@ -119,16 +170,21 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                     .setHTML(
                         '<h5>' + marker.properties.city + '</h5><br>' +
                         '<h6>' + marker.properties.id + '</h6><br>' +
-                        '<button type="button" class="btn btn-info mr-3" onclick=""><?= $img_navigate ?></button>' +
+                        '<button type="button" class="btn btn-info mr-3" onclick="navigate('+ marker.geometry.coordinates[0]+','+marker.geometry.coordinates[1] +')"><?= $img_navigate ?></button>' +
                         '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
                         '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
                     )
                 )
 
                 .addTo(map);
+            console.log(marker.geometry.coordinates)
         }
 
     });
-
+  
+    map.addControl(
+        Direction,
+        'bottom-left'
+    );
 
 </script>
