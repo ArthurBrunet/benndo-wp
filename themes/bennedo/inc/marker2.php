@@ -51,7 +51,7 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
     var geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
         mapboxgl: mapboxgl
-    })
+    });
 
     const a = 1;
 
@@ -131,13 +131,76 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
 
 
     map.addControl(geocoder);
+
     function error(err) {
         Direction.interactive(true);
         $("#map").click(function() {
-            console.log(geocoder.getCountries);
+            var delayInMilliseconds = 500;
+            setTimeout(function() {
+                if (origin !== Direction.getOrigin())
+                {
+                    let origin = Direction.getOrigin();
+                    function httpGet(theUrl)
+                    {
+                        var xmlHttp = new XMLHttpRequest();
+                        xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+                        xmlHttp.send( null );
+                        return xmlHttp.responseText;
+                    }
+                    var long = String(origin.geometry.coordinates[0]).replace('.','I');
+                    var lat = String(origin.geometry.coordinates[1]).replace('.','I');
+                    var objs = JSON.parse(httpGet('http://localhost:8001/bins/getone/'+ long +'/'+ lat +'/300'));
+                    for(let i = 0; i < objs.length; i++) {
+                        const obj = objs[i];
+
+                        // code qui check et update le statut
+
+                        geojson.features.push (
+                            {
+                                "type": "Feature",
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": [obj.Point[0], obj.Point[1]]
+                                },
+                                "properties": {
+                                    "city": obj.city,
+                                    "id": obj.id,
+                                    "status" : 1
+                                }
+                            },
+                        )
+                    }
+                    geojson.features.forEach(function(marker) {
+
+                        // if the trash are not full neither broken
+                        if (marker.properties.status === 1) {
+
+                            // create a HTML element for each feature
+                            var el = document.createElement('div');
+                            el.className = 'marker_green';
+
+                            // make a marker for each feature and add it to the map
+                            new mapboxgl.Marker(el)
+                                .setLngLat(marker.geometry.coordinates)
+                                .setPopup(new mapboxgl.Popup({offset: 25}) // add popups
+                                    .setHTML(
+                                        '<h5>' + marker.properties.city + '</h5><br>' +
+                                        '<h6>' + marker.properties.id + '</h6><br>' +
+                                        '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
+                                        '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
+                                        '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
+                                    )
+                                )
+
+                                .addTo(map);
+
+                        }
+                    });
+                }
+
+            }, delayInMilliseconds);
         });
     }
-
 
     navigator.geolocation.getCurrentPosition(success, error, options);
 
@@ -165,6 +228,7 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
 
 
     // add markers to map
+
     geojson.features.forEach(function(marker) {
 
         // if the trash are not full neither broken
@@ -193,9 +257,11 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
 
     });
 
+
     map.addControl(
         Direction,
         'bottom-left'
     );
+
 
 </script>
