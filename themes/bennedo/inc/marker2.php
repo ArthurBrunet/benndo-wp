@@ -175,10 +175,10 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
             var delayInMilliseconds = 500;
             setTimeout(function() {
                 // à changer pour éviter de refaire la function si tu es sur le même Origin
-                var origin = Direction.getOrigin();
+
                 if (origin !== Direction.getOrigin())
                 {
-
+                    var origin = Direction.getOrigin();
                     function httpGet(theUrl)
                     {
                         var xmlHttp = new XMLHttpRequest();
