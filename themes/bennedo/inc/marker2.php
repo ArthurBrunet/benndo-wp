@@ -1,4 +1,6 @@
 <?php
+include 'data.php';
+
 $img_navigate =     '<img class="img_marker" title ="Naviguer vers"     src="' . get_template_directory_uri() . '/assets/img/navigate.svg" alt="Naviguer vers">';
 $img_trash_full =   '<img class="img_marker" title ="Benne pleine"      src="' . get_template_directory_uri() . '/assets/img/trash-full.svg" alt="Benne Pleine">';
 $img_trash_broken = '<img class="img_marker" title ="Benne déféctueuse" src="' . get_template_directory_uri() . '/assets/img/trash-broken.svg" alt="Benne Déféctueuse">';
@@ -120,10 +122,11 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                         '<h5>' + marker.properties.city + '</h5><br>' +
                         '<h6>' + marker.properties.id + '</h6><br>' +
                         '<button type="button" class="btn btn-info mr-3" onclick=""><?= $img_navigate ?></button>' +
-                        '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
-                        '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
+                        '<button type="button" class="btn btn-danger mr-3" onclick="trash_full(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_trash_full ?></button>' +
+                        '<button type="button" class="btn btn-danger" onclick="broken_full(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_trash_broken ?></button>'
                     )
                 )
+
 
                 .addTo(map);
         }
