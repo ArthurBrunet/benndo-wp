@@ -47,9 +47,3 @@ else {
 $data = "os = ".$os." nav = ".$_SERVER["HTTP_USER_AGENT"] . " ip = " . $_SERVER['REMOTE_ADDR'];
 
 $hash = md5($data);
-
-echo $hash;
-
-
-
-
