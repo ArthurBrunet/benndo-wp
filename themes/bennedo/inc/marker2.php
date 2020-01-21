@@ -96,10 +96,24 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
         var lat = String(crd.latitude).replace('.','I');
 
         var objs = JSON.parse(httpGet('http://localhost:8001/bins/getone/'+ long +'/'+ lat +'/300'));
+        var objs1 = JSON.parse(httpGet('http://localhost:8001/bins/getonedistance/'+ long +'/'+ lat +'/300000000000'));
+        Direction.setDestination(objs1[0].Point);
+        Direction.setOrigin([crd.longitude, crd.latitude]);
 
-        //console.log(objs);
-
-
+        geojson.features.push (
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [objs1[0].Point[0], objs1[0].Point[1]]
+                },
+                "properties": {
+                    "city": objs1[0].city,
+                    "id": objs1[0].id,
+                    "status" : 1
+                }
+            },
+        )
 
         for(let i = 0; i < objs.length; i++) {
             const obj = objs[i];
@@ -122,10 +136,33 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
             )
             //console.log(obj.id);
         }
-        Direction.setOrigin([crd.longitude, crd.latitude]);
 
-        var test = Direction.getOrigin;
-        console.log(test);
+        geojson.features.forEach(function(marker) {
+
+            // if the trash are not full neither broken
+            if (marker.properties.status === 1) {
+
+                // create a HTML element for each feature
+                var el = document.createElement('div');
+                el.className = 'marker_green';
+
+                // make a marker for each feature and add it to the map
+                new mapboxgl.Marker(el)
+                    .setLngLat(marker.geometry.coordinates)
+                    .setPopup(new mapboxgl.Popup({offset: 25}) // add popups
+                        .setHTML(
+                            '<h5>' + marker.properties.city + '</h5><br>' +
+                            '<h6>' + marker.properties.id + '</h6><br>' +
+                            '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
+                            '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
+                            '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
+                        )
+                    )
+
+                    .addTo(map);
+
+            }
+        });
 
     }
 
@@ -137,9 +174,11 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
         $("#map").click(function() {
             var delayInMilliseconds = 500;
             setTimeout(function() {
+                // à changer pour éviter de refaire la function si tu es sur le même Origin
+                var origin = Direction.getOrigin();
                 if (origin !== Direction.getOrigin())
                 {
-                    let origin = Direction.getOrigin();
+
                     function httpGet(theUrl)
                     {
                         var xmlHttp = new XMLHttpRequest();
@@ -149,7 +188,9 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                     }
                     var long = String(origin.geometry.coordinates[0]).replace('.','I');
                     var lat = String(origin.geometry.coordinates[1]).replace('.','I');
-                    var objs = JSON.parse(httpGet('http://localhost:8001/bins/getone/'+ long +'/'+ lat +'/300'));
+                    var objs1 = JSON.parse(httpGet('http://localhost:8001/bins/getonedistance/'+ long +'/'+ lat +'/3000000'));
+                    Direction.setDestination(objs1[0].Point);
+                    var objs = JSON.parse(httpGet('http://localhost:8001/bins/getone/'+ long +'/'+ lat +'/1000'));
                     for(let i = 0; i < objs.length; i++) {
                         const obj = objs[i];
 
