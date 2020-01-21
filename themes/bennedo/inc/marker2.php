@@ -42,13 +42,24 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
 
 <script>
 
+    function httpGet(theUrl)
+    {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
+
+    var reports = JSON.parse(httpGet('http://localhost:8000/reports/getactive'));
+
     mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYXJwcDIiLCJhIjoiY2szazZ6bnJjMDgwYzNtbm1zNHFocGZzNiJ9._V5QyjDorkoGktSpNHc1nA';
 
     var Direction = new MapboxDirections({
         accessToken: mapboxgl.accessToken,
         interactive: false,
         controls:
-            {inputs: false}
+            {inputs: false,
+                instructions: false}
     });
     var geocoder = new MapboxGeocoder({
         accessToken: mapboxgl.accessToken,
@@ -85,20 +96,11 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
         console.log(`Longitude : ${crd.longitude}`);
         console.log(`La précision est de ${crd.accuracy} mètres.`);
 
-        function httpGet(theUrl)
-        {
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-            xmlHttp.send( null );
-            return xmlHttp.responseText;
-        }
-
-
         var long = String(crd.longitude).replace('.','I');
         var lat = String(crd.latitude).replace('.','I');
 
-        var objs = JSON.parse(httpGet('http://localhost:8001/bins/getone/'+ long +'/'+ lat +'/300'));
-        var objs1 = JSON.parse(httpGet('http://localhost:8001/bins/getonedistance/'+ long +'/'+ lat +'/300000000000'));
+        var objs = JSON.parse(httpGet('http://localhost:8000/bins/getone/'+ long +'/'+ lat +'/300'));
+        var objs1 = JSON.parse(httpGet('http://localhost:8000/bins/getonedistance/'+ long +'/'+ lat +'/300000000000'));
         Direction.setDestination(objs1[0].Point);
         Direction.setOrigin([crd.longitude, crd.latitude]);
 
@@ -120,8 +122,6 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
         for(let i = 0; i < objs.length; i++) {
             const obj = objs[i];
 
-            // code qui check et update le statut
-
             geojson.features.push (
                 {
                     "type": "Feature",
@@ -136,10 +136,15 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                     }
                 },
             )
-            //console.log(obj.id);
         }
 
         geojson.features.forEach(function(marker) {
+
+            reports.forEach(function(report) {
+                if (report.id_bin === marker.properties.id) {
+                    marker.properties.status = 0;
+                }
+            });
 
             // if the trash are not full neither broken
             if (marker.properties.status === 1) {
@@ -156,13 +161,30 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                             '<h5>' + marker.properties.city + '</h5><br>' +
                             '<h6>' + marker.properties.id + '</h6><br>' +
                             '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
-                            '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
-                            '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
+                            '<button type="button" class="btn btn-danger mr-3" onclick="trash_full(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_trash_full ?></button>' +
+                            '<button type="button" class="btn btn-danger" onclick="broken_full(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_trash_broken ?></button>'
                         )
                     )
-
                     .addTo(map);
+            }
+            else if (marker.properties.status === 0) {
+                // create a HTML element for each feature
+                var el = document.createElement('div');
+                el.className = 'marker_red';
 
+                // make a marker for each feature and add it to the map
+                new mapboxgl.Marker(el)
+                    .setLngLat(marker.geometry.coordinates)
+                    .setPopup(new mapboxgl.Popup({offset: 25}) // add popups
+                    .setHTML(
+                        '<h5>' + marker.properties.city + '</h5><br>' +
+                        '<h6>' + marker.properties.id + '</h6><br>' +
+                        '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
+                        '<button type="button" class="btn btn-danger mr-3" onclick="yes(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
+                        '<button type="button" class="btn btn-danger" onclick="no(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
+                        )
+                    )
+                    .addTo(map);
             }
         });
 
@@ -190,13 +212,11 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                     }
                     var long = String(origin.geometry.coordinates[0]).replace('.','I');
                     var lat = String(origin.geometry.coordinates[1]).replace('.','I');
-                    var objs1 = JSON.parse(httpGet('http://localhost:8001/bins/getonedistance/'+ long +'/'+ lat +'/3000000'));
+                    var objs1 = JSON.parse(httpGet('http://localhost:8000/bins/getonedistance/'+ long +'/'+ lat +'/3000000'));
                     Direction.setDestination(objs1[0].Point);
-                    var objs = JSON.parse(httpGet('http://localhost:8001/bins/getone/'+ long +'/'+ lat +'/1000'));
+                    var objs = JSON.parse(httpGet('http://localhost:8000/bins/getone/'+ long +'/'+ lat +'/1000'));
                     for(let i = 0; i < objs.length; i++) {
                         const obj = objs[i];
-
-                        // code qui check et update le statut
 
                         geojson.features.push (
                             {
@@ -215,6 +235,12 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                     }
                     geojson.features.forEach(function(marker) {
 
+                        reports.forEach(function(report) {
+                            if (report.id_bin === marker.properties.id) {
+                                marker.properties.status = 0;
+                            }
+                        });
+
                         // if the trash are not full neither broken
                         if (marker.properties.status === 1) {
 
@@ -230,13 +256,30 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                                         '<h5>' + marker.properties.city + '</h5><br>' +
                                         '<h6>' + marker.properties.id + '</h6><br>' +
                                         '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
-                                        '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
-                                        '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
+                                        '<button type="button" class="btn btn-danger mr-3" onclick="trash_full(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_trash_full ?></button>' +
+                                        '<button type="button" class="btn btn-danger" onclick="broken_full(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_trash_broken ?></button>'
                                     )
                                 )
-
                                 .addTo(map);
+                        }
+                        else if (marker.properties.status === 0) {
+                            // create a HTML element for each feature
+                            var el = document.createElement('div');
+                            el.className = 'marker_red';
 
+                            // make a marker for each feature and add it to the map
+                            new mapboxgl.Marker(el)
+                                .setLngLat(marker.geometry.coordinates)
+                                .setPopup(new mapboxgl.Popup({offset: 25}) // add popups
+                                .setHTML(
+                                    '<h5>' + marker.properties.city + '</h5><br>' +
+                                    '<h6>' + marker.properties.id + '</h6><br>' +
+                                    '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
+                                    '<button type="button" class="btn btn-danger mr-3" onclick="yes(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
+                                    '<button type="button" class="btn btn-danger" onclick="no(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
+                                    )
+                                )
+                                .addTo(map);
                         }
                     });
                 }
@@ -258,11 +301,6 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
             showUserLocation: true,
             trackUserLocation: true
     }));
-
-
-
-
-
 
     function navigate(i,y)
     {
@@ -299,6 +337,25 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                 .addTo(map);
 
         }
+        else if (marker.properties.status === 0) {
+                                    // create a HTML element for each feature
+                                    var el = document.createElement('div');
+                                    el.className = 'marker_red';
+
+                                    // make a marker for each feature and add it to the map
+                                    new mapboxgl.Marker(el)
+                                        .setLngLat(marker.geometry.coordinates)
+                                        .setPopup(new mapboxgl.Popup({offset: 25}) // add popups
+                                        .setHTML(
+                                            '<h5>' + marker.properties.city + '</h5><br>' +
+                                            '<h6>' + marker.properties.id + '</h6><br>' +
+                                            '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
+                                            '<button type="button" class="btn btn-danger mr-3" onclick="yes(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
+                                            '<button type="button" class="btn btn-danger" onclick="no(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
+                                            )
+                                        )
+                                        .addTo(map);
+                                }
 
     });
 
