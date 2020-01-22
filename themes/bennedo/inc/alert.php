@@ -44,6 +44,28 @@
     }
 
     function yes(){
+        var json =
+                [
+                    {
+                        "id_bin": id_bin,
+                        "hash_consumer": hash_consumer,
+                        "action" : "confirm",
+                        "type" : "null"
+                    }
+                ];
+
+                var data = JSON.stringify(json);
+                console.log(json);
+                console.log(data);
+
+                var req = new XMLHttpRequest();
+                req.open('POST', 'http://localhost:8001/reports/create', true);
+                req.setRequestHeader('Content-Type', 'application/json');
+                req.setRequestHeader('Access-Control-Allow-Origin', '*');
+                req.setRequestHeader('Access-Control-Allow-Methods', 'POST');
+                req.setRequestHeader('Access-Control-Allow-Headers', 'Content-Type');
+                req.send(data);
+
         Swal.fire({
             title: 'Oui !',
             text: 'Votre réponse a bien été pris en compte',
@@ -53,6 +75,28 @@
     }
 
     function no(){
+    var json =
+                    [
+                        {
+                            "id_bin": id_bin,
+                            "hash_consumer": hash_consumer,
+                            "action" : "refute",
+                            "type" : "null"
+                        }
+                    ];
+
+                    var data = JSON.stringify(json);
+                    console.log(json);
+                    console.log(data);
+
+                    var req = new XMLHttpRequest();
+                    req.open('POST', 'http://localhost:8001/reports/create', true);
+                    req.setRequestHeader('Content-Type', 'application/json');
+                    req.setRequestHeader('Access-Control-Allow-Origin', '*');
+                    req.setRequestHeader('Access-Control-Allow-Methods', 'POST');
+                    req.setRequestHeader('Access-Control-Allow-Headers', 'Content-Type');
+                    req.send(data);
+
         Swal.fire({
             title: 'Non !',
             text: 'Votre réponse a bien été pris en compte',
