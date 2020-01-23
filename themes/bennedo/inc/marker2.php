@@ -143,6 +143,14 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
             reports.forEach(function(report) {
                 if (report.id_bin === marker.properties.id) {
                     marker.properties.status = 0;
+
+                    let history = JSON.parse(httpGet('http://localhost:8000/reports/gethistory/'+report.id));
+                    history.forEach(function(item) {
+                        if (history.id_consumer == idCurrentConsumer) {
+                            if(history.action == 'refute') {var userActionRefute = true;}
+                            if(history.action == 'confirm') {var userActionConfirm = true;}
+                        }
+                    })
                 }
             });
 
@@ -172,6 +180,14 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                 var el = document.createElement('div');
                 el.className = 'marker_red';
 
+                if (userActionConfirm == true) {
+                    var firstFunctionToUse = 'actionImpossible';
+                } else {var firstFunctionToUse = 'yes';}
+
+                if (userActionRefute == true) {
+                    var secondFunctionToUse = 'actionImpossible';
+                } else {var secondFunctionToUse = 'no';}
+
                 // make a marker for each feature and add it to the map
                 new mapboxgl.Marker(el)
                     .setLngLat(marker.geometry.coordinates)
@@ -180,8 +196,8 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                         '<h5>' + marker.properties.city + '</h5><br>' +
                         '<h6>' + marker.properties.id + '</h6><br>' +
                         '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
-                        '<button type="button" class="btn btn-danger mr-3" onclick="yes(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
-                        '<button type="button" class="btn btn-danger" onclick="no(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
+                        '<button type="button" class="btn btn-danger mr-3" onclick="\''+ firstFunctionToUse +'\'(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
+                        '<button type="button" class="btn btn-danger" onclick="\''+ secondFunctionToUse +'\'(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
                         )
                     )
                     .addTo(map);
@@ -238,6 +254,14 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                         reports.forEach(function(report) {
                             if (report.id_bin === marker.properties.id) {
                                 marker.properties.status = 0;
+
+                                let history = JSON.parse(httpGet('http://localhost:8000/reports/gethistory/'+report.id));
+                                                    history.forEach(function(item) {
+                                                        if (history.id_consumer == id_consumer) {
+                                                            if(history.action == 'refute') {var userActionRefute = true;}
+                                                            if(history.action == 'confirm') {var userActionConfirm = true;}
+                                                        }
+                                                    })
                             }
                         });
 
@@ -267,6 +291,14 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                             var el = document.createElement('div');
                             el.className = 'marker_red';
 
+                            if (userActionConfirm == true) {
+                                                var firstFunctionToUse = 'actionImpossible';
+                                            } else {var firstFunctionToUse = 'yes';}
+
+                                            if (userActionRefute == true) {
+                                                var secondFunctionToUse = 'actionImpossible';
+                                            } else {var secondFunctionToUse = 'no';}
+
                             // make a marker for each feature and add it to the map
                             new mapboxgl.Marker(el)
                                 .setLngLat(marker.geometry.coordinates)
@@ -275,8 +307,8 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                                     '<h5>' + marker.properties.city + '</h5><br>' +
                                     '<h6>' + marker.properties.id + '</h6><br>' +
                                     '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
-                                    '<button type="button" class="btn btn-danger mr-3" onclick="yes(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
-                                    '<button type="button" class="btn btn-danger" onclick="no(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
+                                    '<button type="button" class="btn btn-danger mr-3" onclick="\''+ firstFunctionToUse +'\'(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
+                                    '<button type="button" class="btn btn-danger" onclick="\''+ secondFunctionToUse +'\'(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
                                     )
                                 )
                                 .addTo(map);
@@ -312,6 +344,20 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
 
     geojson.features.forEach(function(marker) {
 
+        reports.forEach(function(report) {
+                                if (report.id_bin === marker.properties.id) {
+                                    marker.properties.status = 0;
+
+                                    let history = JSON.parse(httpGet('http://localhost:8000/reports/gethistory/'+report.id));
+                                                        history.forEach(function(item) {
+                                                            if (history.id_consumer == id_consumer) {
+                                                                if(history.action == 'refute') {var userActionRefute = true;}
+                                                                if(history.action == 'confirm') {var userActionConfirm = true;}
+                                                            }
+                                                        })
+                                }
+                            });
+
         // if the trash are not full neither broken
         if (marker.properties.status === 1) {
 
@@ -342,6 +388,14 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                                     var el = document.createElement('div');
                                     el.className = 'marker_red';
 
+                                    if (userActionConfirm == true) {
+                                                                                    var firstFunctionToUse = 'actionImpossible';
+                                                                                } else {var firstFunctionToUse = 'yes';}
+
+                                                                                if (userActionRefute == true) {
+                                                                                    var secondFunctionToUse = 'actionImpossible';
+                                                                                } else {var secondFunctionToUse = 'no';}
+
                                     // make a marker for each feature and add it to the map
                                     new mapboxgl.Marker(el)
                                         .setLngLat(marker.geometry.coordinates)
@@ -350,8 +404,8 @@ $red_marker =               get_template_directory_uri() . '/assets/img/red.png'
                                             '<h5>' + marker.properties.city + '</h5><br>' +
                                             '<h6>' + marker.properties.id + '</h6><br>' +
                                             '<button type="button" class="btn btn-info mr-3" onclick="navigate(' + marker.geometry.coordinates[0] + ',' + marker.geometry.coordinates[1] + ')"><?= $img_navigate ?></button>' +
-                                            '<button type="button" class="btn btn-danger mr-3" onclick="yes(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
-                                            '<button type="button" class="btn btn-danger" onclick="no(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
+                                            '<button type="button" class="btn btn-danger mr-3" onclick="\''+ firstFunctionToUse +'\'(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_yes ?></button>' +
+                                                                    '<button type="button" class="btn btn-danger" onclick="\''+ secondFunctionToUse +'\'(\'' + marker.properties.id + '\', \'<?= $hash ?>\')"><?= $img_no ?></button>'
                                             )
                                         )
                                         .addTo(map);

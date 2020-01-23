@@ -74,6 +74,15 @@
         })
     }
 
+    function actionImpossible(){
+        Swal.fire({
+                    title: 'Action impossible !',
+                    text: 'Vous avez déjà envoyé ce signalement',
+                    icon: 'warning',
+                    confirmButtonText: 'Ok'
+                })
+    }
+
     function no(){
     var json =
                     [
