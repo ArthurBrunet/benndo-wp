@@ -8,6 +8,7 @@
  *
  * @package bennedo
  */
+
            $args = array(
                         "page"       => 'politique-de-confidentialite',
                     );
@@ -57,11 +58,6 @@
     </footer>
 </div>
 
-
-
-
-
-
 <?php wp_footer() ?>
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.css' rel='stylesheet' />
@@ -74,8 +70,7 @@
 />
 <?php
 include "inc/alert.php";
-include "inc/api.php";
-include "inc/marker2.php";
+include "inc/marker.php";
 include "inc/f.php";
 include "inc/data.php";
 

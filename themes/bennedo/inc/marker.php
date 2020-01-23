@@ -1,71 +1,134 @@
 <?php
-
 $img_navigate =     '<img class="img_marker" title ="Naviguer vers"     src="' . get_template_directory_uri() . '/assets/img/navigate.svg" alt="Naviguer vers">';
 $img_trash_full =   '<img class="img_marker" title ="Benne pleine"      src="' . get_template_directory_uri() . '/assets/img/trash-full.svg" alt="Benne Pleine">';
 $img_trash_broken = '<img class="img_marker" title ="Benne déféctueuse" src="' . get_template_directory_uri() . '/assets/img/trash-broken.svg" alt="Benne Déféctueuse">';
 $img_yes =          '<img class="img_marker" title ="Oui"               src="' . get_template_directory_uri() . '/assets/img/yes.svg" alt="Oui">';
 $img_no =           '<img class="img_marker" title ="Non"               src="' . get_template_directory_uri() . '/assets/img/no.svg" alt="Non">';
-$green_marker =            get_template_directory_uri() . '/assets/img/yes.svg';
 
-
-$full = 0;
-$i = 0;
+$green_marker =             get_template_directory_uri() . '/assets/img/green.png';
+$red_marker =               get_template_directory_uri() . '/assets/img/red.png';
 
 ?>
-
 <script>
+    function httpGet(theUrl)
+    {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
 
-    var greenIcon = L.icon({
-        iconUrl: '<?=  $green_marker ?>',
+    var objs = JSON.parse(httpGet('http://localhost:8001/bins/getall'));
 
-        iconSize:     [38, 95], // size of the icon
-        shadowSize:   [50, 64], // size of the shadow
-        iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-    });
+    //console.log(objs);
 
-    var greenIcon2 = new greenIcon({iconUrl: '<?=  $green_marker ?>'}),
+    const geojson =
+        {
+            "type": "FeatureCollection",
+            "features": []
+        };
+    //console.log(geojson);
 
+    for(let i = 0; i < objs.length; i++) {
+        const obj = objs[i];
+
+        // code qui check et update le statut
+
+        geojson.features.push (
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [obj.Point[0], obj.Point[1]]
+                },
+                "properties": {
+                    "city": obj.city,
+                    "id": obj.id,
+                    "status" : 1
+                }
+            },
+        )
+        //console.log(obj.id);
+    }
+
+    console.log(geojson);
 </script>
 
-<?php
-foreach ($json["records"] as $value){
+<style>
+    .marker_green {
+        background-image: url('<?=  $green_marker ?>');
+        background-size: cover;
+        width: 30px;
+        height: 50px;
+        cursor: pointer;
+    }
 
-               $long = $value['geometry']['coordinates'][0];
-               $lat = $value['geometry']['coordinates'][1];
-               $adress = $value['fields']['commune'];
+    .marker_red {
+        background-image: url('<?=  $red_marker ?>');
+        background-size: cover;
+        width: 30px;
+        height: 50px;
+        cursor: pointer;
+    }
 
-    $i++;
-    ?>
-    <script>
-        var coord = [<?= $long .','. $lat ?>];
-        <?php if ($full == 1){ ?>
-        var popup = new mapboxgl.Popup({ offset: 25 })
-            .setHTML(
-                '<h5 class="">24 place St Marc <br>76000 <?= $adress ?></h5><br>' +
-                '<button type="button" class="btn btn-info mr-3" onclick=""><?= $img_navigate ?></button>' +
-                '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_trash_full ?></button>' +
-                '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_trash_broken ?></button>'
-            );
-            <?php } else { ?>
-        var popup = new mapboxgl.Popup({ offset: 25 })
-            .setHTML(
-                '<h5 class="">24 place St Marc <br>76000 <?= $adress ?></h5><br>' +
-                '<h6>La benne est elle toujours pleine ou défectueuse ?</h6><br>' +
-                '<button type="button" class="btn btn-info mr-3" onclick=""><?= $img_navigate ?></button>' +
-                '<button type="button" class="btn btn-success mr-3" onclick="yes()"><?= $img_yes ?></button>' +
-                '<button type="button" class="btn btn-danger" onclick="no()"><?= $img_no ?></button>'
-            );
-            <?php } ?>
+    .mapboxgl-popup {
+        max-width: 200px;
+        border-radius: 15px;
+    }
+    .mapboxgl-popup-content {
+        text-align: center;
+        font-family: 'Open Sans', sans-serif;
+    }
 
-        var marker = new mapboxgl.Marker({icon: greenIcon2})
-            .setLngLat(coord)
-            .setPopup(popup) // sets a popup on this marker
-            .addTo(map);
+</style>
 
+<script>
+    const a = 1;
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia2FuYXJwcDIiLCJhIjoiY2szazZ6bnJjMDgwYzNtbm1zNHFocGZzNiJ9._V5QyjDorkoGktSpNHc1nA';
 
-    </script>
-<?php
-} ?>
+    // Create the map
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v9',
+        center: [1.43, 43.7],
+        zoom: 15
+    });
 
 
+    map.addControl(
+        new MapboxGeocoder({
+            accessToken: mapboxgl.accessToken,
+            mapboxgl: mapboxgl
+        })
+    );
+
+    // add markers to map
+    geojson.features.forEach(function(marker) {
+
+        // if the trash are not full neither broken
+        if (marker.properties.status === 1) {
+
+            // create a HTML element for each feature
+            var el = document.createElement('div');
+            el.className = 'marker_green';
+
+            // make a marker for each feature and add it to the map
+            new mapboxgl.Marker(el)
+                .setLngLat(marker.geometry.coordinates)
+                .setPopup(new mapboxgl.Popup({offset: 25}) // add popups
+                    .setHTML(
+                        '<h5>' + marker.properties.city + '</h5><br>' +
+                        '<h6>' + marker.properties.id + '</h6><br>' +
+                        '<button type="button" class="btn btn-info mr-3" onclick=""><?= $img_navigate ?></button>' +
+                        '<button type="button" class="btn btn-danger mr-3" onclick="trash_full()"><?= $img_yes ?></button>' +
+                        '<button type="button" class="btn btn-danger" onclick="broken_full()"><?= $img_no ?></button>'
+                    )
+                )
+
+                .addTo(map);
+        }
+
+    });
+
+
+</script>
