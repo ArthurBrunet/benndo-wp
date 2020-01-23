@@ -30,8 +30,8 @@ Cloner le repertoire / Clone the repository
 
 ```
 https://github.com/Jonathan-Renault/benndo-wp.git
-Le copier à la place du dossier WP-content / Paste it instead of WP-content
 ```
+Le copier à la place du dossier WP-content / Paste it instead of WP-content
 
 ## Built With
 
